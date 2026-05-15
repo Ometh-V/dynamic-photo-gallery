@@ -1,0 +1,5 @@
+photos/
+.git/
+*.md
+generate-manifest.js
+manifest.json

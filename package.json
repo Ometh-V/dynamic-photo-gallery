@@ -1,0 +1,8 @@
+{
+  "name": "dynamic-photo-gallery",
+  "version": "1.0.0",
+  "description": "Lightweight static photo gallery",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

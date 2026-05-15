@@ -1,0 +1,176 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #111;
+  color: #e0e0e0;
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #222;
+}
+
+header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+/* ── Main ────────────────────────────────────────────────── */
+main {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+/* ── Gallery grid ────────────────────────────────────────── */
+#gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+#gallery img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+  background: #1e1e1e;
+}
+
+#gallery img:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+#empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 60vh;
+  color: #555;
+  text-align: center;
+}
+
+#empty-state .empty-icon {
+  font-size: 4rem;
+  line-height: 1;
+  filter: grayscale(1) opacity(0.4);
+}
+
+#empty-state p {
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+}
+
+/* ── Lightbox ────────────────────────────────────────────── */
+#lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 100;
+  padding: 1rem;
+}
+
+#lightbox[hidden] {
+  display: none;
+}
+
+#lb-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 90vw;
+}
+
+#lb-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 4px;
+  display: block;
+}
+
+#lb-caption {
+  font-size: 0.875rem;
+  color: #aaa;
+  letter-spacing: 0.01em;
+}
+
+/* ── Lightbox buttons ────────────────────────────────────── */
+#lb-close {
+  position: fixed;
+  top: 1rem;
+  right: 1.25rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+#lb-close:hover {
+  color: #fff;
+}
+
+#lb-prev,
+#lb-next {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  user-select: none;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+#lb-prev:hover,
+#lb-next:hover {
+  color: #fff;
+}
+
+#lb-prev[disabled],
+#lb-next[disabled] {
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* ── Responsive tweaks ───────────────────────────────────── */
+@media (max-width: 480px) {
+  #gallery {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  #lb-prev,
+  #lb-next {
+    font-size: 2rem;
+  }
+}
