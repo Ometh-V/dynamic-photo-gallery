@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - Adding-CI
+
+jobs:
+  test-container:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: |
+          docker build -t photo-app:${{ github.sha }} .
+
+      - name: Run container
+        run: |
+          docker run -d \
+            --name photo-app \
+            -p 3000:3000 \
+            photo-app:${{ github.sha }}
+
+      - name: Wait for startup
+        run: sleep 10
+
+      - name: Check container status
+        run: |
+          docker ps
+          docker logs photo-app
+
+      - name: Smoke test
+        run: |
+          curl -f http://localhost:3000
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker logs photo-app
+          docker stop photo-app || true
+          docker rm photo-app || true
