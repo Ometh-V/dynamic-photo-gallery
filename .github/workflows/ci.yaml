@@ -27,3 +27,10 @@ jobs:
             --name ngrok \
             -e NGROK_AUTHTOKEN=${{ secrets.NGROK_TOKEN }} \
             ngrok/ngrok:latest http host.docker.internal:3000
+  
+      - name: Wait for ngrok
+        run: sleep 10
+
+      - name: Get ngrok URL
+        run: |
+          curl http://localhost:4040/api/tunnels
