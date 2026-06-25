@@ -1,26 +1,34 @@
-name: CI
+name: Expose Docker Container via ngrok
 
 on:
-  pull_request:
   push:
     branches:
       - Adding-CI
 
-
 jobs:
-  test-container:
+  expose:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Build image
-        run: |
-          docker build -t photo-app:${{ github.sha }} .
+      - name: Build Docker image
+        run: docker build -t myapp .
 
-      - name: Run app
+      - name: Run Docker container
+        run: docker run -d -p 3000:3000 --name myapp-container myapp
+
+      - name: Wait for container to be ready
         run: |
-          docker run -d -p 3000:3000 photo-app:${{ github.sha }}
+          for i in {1..10}; do
+            curl -sf http://localhost:3000 && break
+            echo "Waiting for app..."
+            sleep 3
+          done
+
+      - name: Show container logs (debugging)
+        if: always()
+        run: docker logs myapp-container
 
       - name: Install ngrok
         run: |
@@ -31,12 +39,17 @@ jobs:
       - name: Authenticate ngrok
         run: ngrok config add-authtoken ${{ secrets.NGROK_TOKEN }}
 
-      - name: Start ngrok tunnel and print URL
+      - name: Start ngrok tunnel
         run: |
-          ngrok http 8080 --log=stdout > ngrok.log &
+          ngrok http 3000 --log=stdout > ngrok.log &
           sleep 5
-          curl -s http://localhost:4040/api/tunnels | tee tunnel.json
-          cat tunnel.json | grep -o '"public_url":"[^"]*' | cut -d'"' -f4
 
-      - name: Keep tunnel alive (for testing duration)
-        run: sleep 300   # 5 minutes — adjust as needed
+      - name: Extract and show ngrok URL
+        id: ngrok
+        run: |
+          URL=$(curl -s http://localhost:4040/api/tunnels | python3 -c "import sys, json; print(json.load(sys.stdin)['tunnels'][0]['public_url'])")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "🔗 Public URL: $URL"
+
+      - name: Keep tunnel alive
+        run: sleep 300   # adjust how long you want it exposed
