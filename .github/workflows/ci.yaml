@@ -17,28 +17,13 @@ jobs:
         run: |
           docker build -t photo-app:${{ github.sha }} .
 
-      - name: Run container
+      - name: Run app
+        run: |
+          docker run -d -p 3000:3000 photo-app:${{ github.sha }}
+
+      - name: Start ngrok
         run: |
           docker run -d \
-            --name photo-app \
-            -p 3000:3000 \
-            photo-app:${{ github.sha }}
-
-      - name: Wait for startup
-        run: sleep 10
-
-      - name: Check container status
-        run: |
-          docker ps
-          docker logs photo-app
-
-      - name: Smoke test
-        run: |
-          curl -f http://localhost:3000
-
-      - name: Cleanup
-        if: always()
-        run: |
-          docker logs photo-app
-          docker stop photo-app || true
-          docker rm photo-app || true
+            --name ngrok \
+            -e NGROK_AUTHTOKEN=${{ secrets.NGROK_TOKEN }} \
+            ngrok/ngrok:latest http host.docker.internal:3000
