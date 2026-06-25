@@ -21,13 +21,21 @@ jobs:
         run: |
           docker run -d -p 3000:3000 photo-app:${{ github.sha }}
 
-      - name: Start ngrok
+      - name: Install ngrok
         run: |
-          docker run -d \
-            --name ngrok \
-            -e NGROK_AUTHTOKEN=${{ secrets.NGROK_TOKEN }} \
-            ngrok/ngrok:latest http host.docker.internal:3000
-            
-      - name: Show ngrok logs
+          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+          sudo apt update && sudo apt install ngrok
+
+      - name: Authenticate ngrok
+        run: ngrok config add-authtoken ${{ secrets.NGROK_TOKEN }}
+
+      - name: Start ngrok tunnel and print URL
         run: |
-          docker logs ngrok
+          ngrok http 8080 --log=stdout > ngrok.log &
+          sleep 5
+          curl -s http://localhost:4040/api/tunnels | tee tunnel.json
+          cat tunnel.json | grep -o '"public_url":"[^"]*' | cut -d'"' -f4
+
+      - name: Keep tunnel alive (for testing duration)
+        run: sleep 300   # 5 minutes — adjust as needed
