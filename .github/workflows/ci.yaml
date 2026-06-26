@@ -6,7 +6,7 @@ on:
       - Adding-CI
 
 jobs:
-  expose:
+  build-container:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
